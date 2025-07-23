@@ -24,7 +24,7 @@ def write_to_file(board: Board, current_depth):
     global logger
     if board.depth == current_depth:
         logger.clear()
-    board_repr = BoardRepr(board.unicode_array_repr(), current_depth, board.evaluate())
+    board_repr = BoardRepr(board.unicode_array_repr(), current_depth, board.leosevaluate())
     logger.append(board_repr)
 
 
@@ -32,7 +32,7 @@ def write_to_file(board: Board, current_depth):
 def minimax(board, depth, alpha, beta, max_player, save_move, data):
 
     if depth == 0 or board.is_terminal():
-        data[1] = board.evaluate()
+        data[1] = board.leosevaluate()
         return data
 
     if max_player:

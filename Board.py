@@ -1,6 +1,69 @@
 from ChessPiece import *
 from copy import deepcopy
 
+michniewski_tables = {
+    'P': [
+        0,  0,  0,  0,  0,  0,  0,  0,
+        5, 10, 10,-20,-20, 10, 10,  5,
+        5, -5,-10,  0,  0,-10, -5,  5,
+        0,  0,  0, 20, 20,  0,  0,  0,
+        5,  5, 10, 25, 25, 10,  5,  5,
+        10,10, 20, 30, 30, 20, 10, 10,
+        50,50, 50, 50, 50, 50, 50, 50,
+        0,  0,  0,  0,  0,  0,  0,  0
+    ],
+    'K': [
+        -50,-40,-30,-30,-30,-30,-40,-50,
+        -40,-20,  0,  5,  5,  0,-20,-40,
+        -30,  5, 10, 15, 15, 10,  5,-30,
+        -30,  0, 15, 20, 20, 15,  0,-30,
+        -30,  5, 15, 20, 20, 15,  5,-30,
+        -30,  0, 10, 15, 15, 10,  0,-30,
+        -40,-20,  0,  0,  0,  0,-20,-40,
+        -50,-40,-30,-30,-30,-30,-40,-50
+    ],
+    'B': [
+        -20,-10,-10,-10,-10,-10,-10,-20,
+        -10,  5,  0,  0,  0,  0,  5,-10,
+        -10, 10, 10, 10, 10, 10, 10,-10,
+        -10,  0, 10, 10, 10, 10,  0,-10,
+        -10,  5,  5, 10, 10,  5,  5,-10,
+        -10,  0,  5, 10, 10,  5,  0,-10,
+        -10,  0,  0,  0,  0,  0,  0,-10,
+        -20,-10,-10,-10,-10,-10,-10,-20
+    ],
+    'R': [
+         0,  0,  0,  0,  0,  0,  0,  0,
+         5, 10, 10, 10, 10, 10, 10,  5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+        -5,  0,  0,  0,  0,  0,  0, -5,
+         0,  0,  0,  5,  5,  0,  0,  0
+    ],
+    'Q': [
+        -20,-10,-10, -5, -5,-10,-10,-20,
+        -10,  0,  0,  0,  0,  0,  0,-10,
+        -10,  0,  5,  5,  5,  5,  0,-10,
+         -5,  0,  5,  5,  5,  5,  0, -5,
+          0,  0,  5,  5,  5,  5,  0, -5,
+        -10,  5,  5,  5,  5,  5,  0,-10,
+        -10,  0,  5,  0,  0,  0,  0,-10,
+        -20,-10,-10, -5, -5,-10,-10,-20
+    ],
+    'K': [
+        20, 30, 10,  0,  0, 10, 30, 20,
+        20, 20,  0,  0,  0,  0, 20, 20,
+       -10,-20,-20,-20,-20,-20,-20,-10,
+       -20,-30,-30,-40,-40,-30,-30,-20,
+       -30,-40,-40,-50,-50,-40,-40,-30,
+       -30,-40,-40,-50,-50,-40,-40,-30,
+       -30,-40,-40,-50,-50,-40,-40,-30,
+       -30,-40,-40,-50,-50,-40,-40,-30
+    ]
+}
+
 
 class Board:
 
@@ -234,6 +297,38 @@ class Board:
         if self.game_mode == 0:
             return black_points - white_points
         return white_points - black_points
+    
+    
+    def leosevaluate(self):
+        score = 0
+        for i in range(8):
+            for j in range(8):
+                piece = self[i][j]
+                if isinstance(piece, ChessPiece):
+                    piece_type = piece.__class__.__name__[0].upper()
+                    value = piece.get_score()
+                    # Get positional table for piece type
+                    table = michniewski_tables.get(piece_type, [0]*64)
+
+                    # Convert (i, j) to 0-63 index — row-major order
+                    index = i * 8 + j
+                    print("the index is", index)
+
+                    # Flip index for white pieces since tables are from black's POV
+                    if piece.color == 'white':
+                        flipped_index = (7 - i) * 8 + j
+                        positional = table[flipped_index]
+                    else:
+                        positional = table[index]
+                        print("this is the positional", positional)
+
+                    if piece.color == 'black':
+                        score += value + positional
+                        print("the score is", score)
+                    else:
+                        score -= value + positional
+
+        return score
 
     def __str__(self):
         return str(self[::-1]).replace('], ', ']\n')
