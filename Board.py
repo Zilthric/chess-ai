@@ -351,7 +351,7 @@ class Board:
 
                     # Convert (i, j) to 0-63 index — row-major order
                     index = i * 8 + j
-                    #print("the index is", index)
+                    print("the index is", index)
 
                     # Flip index for white pieces since tables are from black's POV
                     if piece.color == 'white':
