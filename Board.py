@@ -70,7 +70,7 @@ class Board:
     whites = []
     blacks = []
 
-    def __init__(self, game_mode, ai=False, depth=2, log=False):    # game_mode == 0 : whites down/blacks up
+    def __init__(self, game_mode, ai=False, depth=4, log=False):    # game_mode == 0 : whites down/blacks up
         self.board = []
         self.game_mode = game_mode
         self.depth = depth
@@ -113,7 +113,33 @@ class Board:
         if self.game_mode != 0:
             self.reverse()
 
+    def white_queen_switch(self):
+        for i in range(8):
+            piece = self[7][i]
+            if isinstance(piece, Pawn):
+                if piece in self.whites:
+                    self.whites.remove(piece)
+                queen = Queen('white', 7, i, '\u2655')
+                self.board[7][i] = queen
+                self.whites.append(queen)
+                return i
+        return None
+
+    def black_queen_switch(self):
+        for i in range(8):
+            piece = self[0][i]
+            if isinstance(piece, Pawn):
+                if piece in self.blacks:
+                    self.whites.remove(piece)
+                queen = Queen('black', 0, i, '\u265B')
+                self.board[0][i] = queen
+                self.blacks.append(queen)
+                return i
+        return None
+    
     def save_pieces(self):
+        self.whites.clear()
+        self.blacks.clear()
         for i in range(8):
             for j in range(8):
                 if isinstance(self[i][j], ChessPiece):
@@ -121,8 +147,14 @@ class Board:
                         self.whites.append(self[i][j])
                     else:
                         self.blacks.append(self[i][j])
+    
+    def promote_pawns(self):
+        self.white_queen_switch()
+        self.black_queen_switch()
+        self.save_pieces()
 
     def make_move(self, piece, x, y, keep_history=False):    # history is logged when ai searches for moves
+        self.promote_pawns()
         old_x = piece.x
         old_y = piece.y
         if keep_history:
@@ -130,13 +162,18 @@ class Board:
         else:
             if isinstance(self.board[x][y], ChessPiece):
                 if self.board[x][y].color == 'white':
-                    self.whites.remove(self.board[x][y])
+                    piece = self.board[x][y]
+                    if piece in self.whites:
+                        self.whites.remove(piece)
                 else:
-                    self.blacks.remove(self.board[x][y])
+                    piece = self.board[x][y]
+                    if piece in self.blacks:
+                        self.blacks.remove(piece)
         self.board[x][y] = self.board[old_x][old_y]
         self.board[old_x][old_y] = 'empty-block'
         self.board[x][y].set_position(x, y, keep_history)
-
+        
+    
     def unmake_move(self, piece):
         x = piece.x
         y = piece.y
@@ -201,7 +238,9 @@ class Board:
         if move and len(threats) == 1 and threats[0].x == move[0] and threats[0].y == move[1]:
             return False
         return True if len(threats) > 0 else False
+    
 
+    
     def is_terminal(self):
         terminal1 = self.white_won()
         terminal2 = self.black_won()

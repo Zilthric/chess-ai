@@ -30,7 +30,6 @@ def write_to_file(board: Board, current_depth):
 
 @log_tree
 def minimax(board, depth, alpha, beta, max_player, save_move, data):
-
     if depth == 0 or board.is_terminal():
         data[1] = board.leosevaluate()
         return data
@@ -75,7 +74,6 @@ def minimax(board, depth, alpha, beta, max_player, save_move, data):
                         if beta <= alpha:
                             break
         return data
-
 
 def get_ai_move(board):
     moves = minimax(board, board.depth, -math.inf, math.inf, True, True, [[], 0])

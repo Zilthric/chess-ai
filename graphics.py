@@ -6,6 +6,7 @@ dark_block = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/squar
 light_block = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/square brown light_png_shadow_128px.png')
 dark_block = pygame.transform.scale(dark_block, (75, 75))
 light_block = pygame.transform.scale(light_block, (75, 75))
+#Creating squares
 
 whitePawn = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/w_pawn_png_shadow_128px.png')
 whitePawn = pygame.transform.scale(whitePawn, (75, 75))
@@ -19,7 +20,6 @@ whiteKing = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/w_king
 whiteKing = pygame.transform.scale(whiteKing, (75, 75))
 whiteQueen = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/w_queen_png_shadow_128px.png')
 whiteQueen = pygame.transform.scale(whiteQueen, (75, 75))
-
 blackPawn = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/b_pawn_png_shadow_128px.png')
 blackPawn = pygame.transform.scale(blackPawn, (75, 75))
 blackRook = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/b_rook_png_shadow_128px.png')
@@ -32,13 +32,17 @@ blackKing = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/b_king
 blackKing = pygame.transform.scale(blackKing, (75, 75))
 blackQueen = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/b_queen_png_shadow_128px.png')
 blackQueen = pygame.transform.scale(blackQueen, (75, 75))
+#Creating images of pieces
 
 highlight_block = pygame.image.load('assets/JohnPablok Cburnett Chess set/128px/highlight_128px.png')
 highlight_block = pygame.transform.scale(highlight_block, (75, 75))
+#Creating highlight pieces
 
 screen = None
 pygame.font.init()
+#Sets up pygame stuff
 font = pygame.font.SysFont('Comic Sans MS', 30)
+#Setting font
 
 def initialize():
     global screen
@@ -48,19 +52,24 @@ def initialize():
     pygame.display.set_icon(icon)
     screen = pygame.display.set_mode((600, 650))
     screen.fill((0, 0, 0))
+#Creating the screen and setting the icon
 
 def draw_background(board):
     
     block_x = 0
     for i in range(4):
         block_y = 0
+        #Resets y making it so that it places the blocks going from top to bottom
         for j in range(4):
             screen.blit(light_block, (block_x, block_y))
             screen.blit(dark_block, (block_x + 75, block_y))
             screen.blit(light_block, (block_x + 75, block_y + 75))
             screen.blit(dark_block, (block_x, block_y + 75))
+            #screen.blit adds an image at the specified coordinates
             block_y += 150
+            #Moves down the y coordinate by 150 pixels
         block_x += 150
+        
     step_x = 0
     step_y = pygame.display.get_surface().get_size()[0] - 75
     for i in range(8):
@@ -71,6 +80,7 @@ def draw_background(board):
             step_x += 75
         step_x = 0
         step_y -= 75
+        #Checks if a certain spot on the board is a chess piece and if it is, it updates it to that piece
     pygame.display.update()
 
 def draw_text(text):
@@ -86,6 +96,7 @@ def draw_text(text):
     screen.blit(text_surface, (x, 600))
     screen.blit(text_surface_restart, (150, 620))
     pygame.display.update()
+    #Send win/lose message and restart message to the screen
 
 
 def start(board):
@@ -99,10 +110,19 @@ def start(board):
     if board.game_mode == 1 and board.ai:
         get_ai_move(board)
         draw_background(board)
+        #gets ai move and draws the background
     while running:
+        i2 = board.white_queen_switch()
+        if i2 is not None:
+            # If a pawn reaches the end of the board, it is switched to a queen  
+            board[7][i2] = Queen('white', 7, i2, '\u2655')
+
+        i3 = board.black_queen_switch()
+        if i3 is not None:
+            # If a pawn reaches the end of the board, it is switched to a queen  
+            board[0][i3] = Queen('black', 0, i3, '\u2655')
         if game_over:
             draw_text(game_over_txt)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -138,8 +158,8 @@ def start(board):
                             draw_background(board)
                             if board.ai:
                                 get_ai_move(board)
-                                draw_background(board)
-                                    
+                                draw_background(board) 
+
                         if board.white_won():
                             game_over = True
                             game_over_txt = 'WHITE WINS!'
