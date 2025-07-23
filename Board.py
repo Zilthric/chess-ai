@@ -2,7 +2,7 @@ from ChessPiece import *
 from copy import deepcopy
 
 michniewski_tables = {
-    'P': [
+    'PAWN': [
         0,  0,  0,  0,  0,  0,  0,  0,
         5, 10, 10,-20,-20, 10, 10,  5,
         5, -5,-10,  0,  0,-10, -5,  5,
@@ -12,7 +12,7 @@ michniewski_tables = {
         50,50, 50, 50, 50, 50, 50, 50,
         0,  0,  0,  0,  0,  0,  0,  0
     ],
-    'K': [
+    'KNIGHT': [
         -50,-40,-30,-30,-30,-30,-40,-50,
         -40,-20,  0,  5,  5,  0,-20,-40,
         -30,  5, 10, 15, 15, 10,  5,-30,
@@ -22,7 +22,7 @@ michniewski_tables = {
         -40,-20,  0,  0,  0,  0,-20,-40,
         -50,-40,-30,-30,-30,-30,-40,-50
     ],
-    'B': [
+    'BISHOP': [
         -20,-10,-10,-10,-10,-10,-10,-20,
         -10,  5,  0,  0,  0,  0,  5,-10,
         -10, 10, 10, 10, 10, 10, 10,-10,
@@ -32,7 +32,7 @@ michniewski_tables = {
         -10,  0,  0,  0,  0,  0,  0,-10,
         -20,-10,-10,-10,-10,-10,-10,-20
     ],
-    'R': [
+    'ROOK': [
          0,  0,  0,  0,  0,  0,  0,  0,
          5, 10, 10, 10, 10, 10, 10,  5,
         -5,  0,  0,  0,  0,  0,  0, -5,
@@ -42,7 +42,7 @@ michniewski_tables = {
         -5,  0,  0,  0,  0,  0,  0, -5,
          0,  0,  0,  5,  5,  0,  0,  0
     ],
-    'Q': [
+    'QUEEN': [
         -20,-10,-10, -5, -5,-10,-10,-20,
         -10,  0,  0,  0,  0,  0,  0,-10,
         -10,  0,  5,  5,  5,  5,  0,-10,
@@ -52,7 +52,7 @@ michniewski_tables = {
         -10,  0,  5,  0,  0,  0,  0,-10,
         -20,-10,-10, -5, -5,-10,-10,-20
     ],
-    'K': [
+    'KING': [
         20, 30, 10,  0,  0, 10, 30, 20,
         20, 20,  0,  0,  0,  0, 20, 20,
        -10,-20,-20,-20,-20,-20,-20,-10,
@@ -344,13 +344,16 @@ class Board:
             for j in range(8):
                 piece = self[i][j]
                 if isinstance(piece, ChessPiece):
-                    piece_type = piece.__class__.__name__[0].upper()
+                    piece_type = piece.__class__.__name__.upper()
+                    print("piecetype is", piece_type, "piececolor =", piece.color)
                     value = piece.get_score()
+
                     # Get positional table for piece type
                     table = michniewski_tables.get(piece_type, [0]*64)
-
                     # Convert (i, j) to 0-63 index — row-major order
+                    print("table is", table)
                     index = i * 8 + j
+
                     print("the index is", index)
 
                     # Flip index for white pieces since tables are from black's POV
